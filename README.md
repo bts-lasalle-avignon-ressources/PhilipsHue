@@ -5,6 +5,7 @@
   - [La maquette](#la-maquette)
   - [Application](#application)
   - [OpenHue API](#openhue-api)
+  - [Postman](#postman)
   - [Boutique](#boutique)
   - [Auteurs](#auteurs)
 
@@ -64,6 +65,32 @@ $ wget -c --output-document openapi.yaml 'https://api.redocly.com/registry/bundl
 $ ls -l openapi.yaml
 -rw-rw-r-- 1 tv tv 120480 févr.  6 07:32 openapi.yaml
 ```
+
+## Postman
+
+[Postman](https://fr.wikipedia.org/wiki/Postman_(logiciel)) est une plateforme pour la construction, l'utilisation et les tests d'API.
+
+Lien : https://www.postman.com/
+
+Télécharger et installer la version de [Postman](https://dl.pstmn.io/download/latest/linux_64) pour Linux : https://dl.pstmn.io/download/latest/linux_64
+
+Ou à partir du gestionnaire de paquets _snap_ :
+
+```bash
+$ sudo snap install postman
+```
+
+![](./images/demarrer-postman-ubuntu.png)
+
+![](./images/postman-ubuntu.png)
+
+Il existe aussi un outil en ligne de commande Postman CLI :
+
+```bash
+$ curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+```
+
+> Il existe une extension pour Visual Studio Code : https://marketplace.visualstudio.com/items?itemName=Postman.postman-for-vscode
 
 ## Boutique
 
