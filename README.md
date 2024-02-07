@@ -66,6 +66,84 @@ $ ls -l openapi.yaml
 -rw-rw-r-- 1 tv tv 120480 févr.  6 07:32 openapi.yaml
 ```
 
+Il existe un outil en ligne de commande [OpenHue CLI](https://www.openhue.io/cli/openhue-cli) (https://www.openhue.io/cli/openhue-cli) disponible via [brew](https://brew.sh/fr/) ou [docker](https://hub.docker.com/r/openhue/cli).
+
+- [brew](https://brew.sh/fr/)
+
+```bash
+$ /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+$ brew tap openhue/cli
+$ brew install openhue-cli
+```
+
+```bash
+$ openhue help
+
+openhue controls your Philips Hue lighting system
+
+    Find more information at: https://www.openhue.io/cli
+
+Usage:
+  openhue [command]
+
+Configuration
+  config      Manual openhue CLI setup
+  discover    Hue Bridge discovery
+  setup       Automatic openhue CLI setup
+
+Philips Hue
+  get         Display one or many resources
+  set         Set specific features on resources
+
+Additional Commands:
+  completion  Generate the autocompletion script for the specified shell
+  help        Help about any command
+  version     Print the version information
+
+Flags:
+  -h, --help   help for openhue
+
+Use "openhue [command] --help" for more information about a command.
+```
+
+
+```bash
+$ openhue setup
+[OK] Found Hue Bridge with IP '192.168.52.182'
+[..] Please push the button on your Hue Bridge
+......
+[OK] Successfully paired openhue with your Hue Bridge!
+[OK] Configuration saved in file $HOME/.openhue/config.yaml
+```
+
+La clé (_key_) de l'API se trouve dans le fichier `$HOME/.openhue/config.yaml` :
+
+```bash
+$ cat $HOME/.openhue/config.yaml
+bridge: 192.168.52.182
+key: LiG7XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXvZ8f
+```
+
+```bash
+$ openhue get lights
+```
+
+- [docker](https://hub.docker.com/r/openhue/cli)
+
+```bash
+$ docker pull openhue/cli
+
+$ docker run -v "${HOME}/.openhue:/.openhue" --rm -it --name=openhue openhue/cli help
+...
+
+$ docker run -v "${HOME}/.openhue:/.openhue" --rm -it --name=openhue openhue/cli setup --bridge 192.168.52.182
+...
+
+$ docker run -v "${HOME}/.openhue:/.openhue" --rm -it --name=openhue openhue/cli get lights
+```
+
+
 ## Postman
 
 [Postman](https://fr.wikipedia.org/wiki/Postman_(logiciel)) est une plateforme pour la construction, l'utilisation et les tests d'API.
@@ -84,6 +162,8 @@ $ sudo snap install postman
 
 ![](./images/postman-ubuntu.png)
 
+Créer un compte si nécessaire (campus-btssn-avignon).
+
 Il existe aussi un outil en ligne de commande Postman CLI :
 
 ```bash
@@ -91,6 +171,15 @@ $ curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
 ```
 
 > Il existe une extension pour Visual Studio Code : https://marketplace.visualstudio.com/items?itemName=Postman.postman-for-vscode
+
+Créer un nouvel environnement avec ces deux variables :
+
+- `baseUrl` avec comme valeur initiale et courante l'adresse du pont Hue, par exemple : `https://192.168.52.182`
+- `apiKey`
+
+![](./images/postman-new-environment.png)
+
+
 
 ## Boutique
 
