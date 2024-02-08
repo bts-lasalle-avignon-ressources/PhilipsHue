@@ -31,6 +31,24 @@ L'utilisation du [ZigBee](https://fr.wikipedia.org/wiki/ZigBee) nécessite la pr
 
 ## La maquette
 
+La maquette de test est composé :
+
+- d'une passerelle _Hue Bridge_
+
+![](./images/hue-bridge.jpeg)
+
+- de trois ampoules Hue White and Color Ambiance A60 E27 9W
+
+![](./images/ampoule.jpeg)
+
+- d'un Hue Motion Sensor détecteur de mouvement
+
+![](./images/motion-sensor.jpeg)
+
+- d'un Hue Dimmer switch télécommande nomade et variateur de Lumière
+
+![](./images/dimmer-switch.jpeg)
+
 ## Application
 
 L'application principale du système Philips Hue vous permet d'allumer et d'éteindre vos lumières, de créer des automatisations et des minuteries, de synchroniser vos éclairages avec votre TV et votre musique, de contrôler votre système de sécurité connectée pour la maison.
