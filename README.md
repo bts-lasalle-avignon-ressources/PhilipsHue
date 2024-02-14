@@ -23,6 +23,8 @@ Philips Hue est une sous-marque qui fait partie de la famille Philips et elle es
 
 > La sous-marque Philips Lighting est devenu [Signify](https://www.signify.com/fr-fr). Les produits Philips Hue existent depuis 2013.
 
+![](./images/hue-logo.png)
+
 Pionnier dans le secteur de l'éclairage connecté, Philips Hue est devenu un écosystème propriétaire de gestion de produits connectés ([Domotique](https://fr.wikipedia.org/wiki/Domotique)) communiquant en [ZigBee](https://fr.wikipedia.org/wiki/ZigBee).
 
 Pionnier dans le secteur de l'éclairage connecté, Philips Hue dispose d'une gamme importante d'ampoules et de luminaires qui communiquent en [ZigBee](https://fr.wikipedia.org/wiki/ZigBee).
@@ -88,9 +90,11 @@ $ curl -k --location https://discovery.meethue.com/
 [{"id":"XXXXXXXXXXXXXXXX","internalipaddress":"192.168.52.182","port":443}]
 ```
 
+![](./images/discovery-hue.png)
+
 > Sinon, il faudra utiliser wireshark.
 
-On peut alors obtneir une description du pont Hue :
+On peut alors obtenir une description du pont Hue :
 
 ```bash
 $ curl -k --location  http://192.168.52.182/description.xml
@@ -275,22 +279,25 @@ La liste des éclairages :
 
 ```bash
 $ curl -k --location 'https://192.168.52.182/clip/v2/resource/light' --header 'Accept: application/json' --header 'hue-application-key: XXXXXXXX'
+{"errors":[],"data":[{"id":"5d4ba384-f49c-45a1-a68f-874a5008b967","id_v1":"/lights/3","owner":{"rid":"959b6312-3318-4379-b27a-6e1d6e076b4b","rtype":"device"},"metadata":{"name":"Hue color lamp 3","archetype":"classic_bulb","function":"mixed"},"product_data":{"function":"mixed"},"identify":{},"on":{"on":false},"dimming":{"brightness":8.3,"min_dim_level":0.20000000298023225},"dimming_delta":{},"color_temperature":{"mirek":366,"mirek_valid":true,"mirek_schema":{"mirek_minimum":153,"mirek_maximum":500}},"color_temperature_delta":{},"color":{"xy":{"x":0.4573,"y":0.41},"gamut":{"red":{"x":0.6915,"y":0.3083},"green":{"x":0.17,"y":0.7},"blue":{"x":0.1532,"y":0.0475}},"gamut_type":"C"},"dynamics":{"status":"none","status_values":["none","dynamic_palette"],"speed":0.0,"speed_valid":false},"alert":{"action_values":["breathe"]},"signaling":{"signal_values":["no_signal","on_off","on_off_color","alternating"]},"mode":"normal","effects":{"status_values":["no_effect","candle","fire","prism"],"status":"no_effect","effect_values":["no_effect","candle","fire","prism"]},"powerup":{"preset":"safety","configured":true,"on":{"mode":"on","on":{"on":true}},"dimming":{"mode":"dimming","dimming":{"brightness":100.0}},"color":{"mode":"color_temperature","color_temperature":{"mirek":366}}},"type":"light"},{"id":"a40100ed-eedf-4f8b-b5f9-271b790edb2f","id_v1":"/lights/2","owner":{"rid":"73138873-8a25-460f-a48d-b05ad72dd5f7","rtype":"device"},"metadata":{"name":"Hue color lamp 2","archetype":"classic_bulb","function":"mixed"},"product_data":{"function":"mixed"},"identify":{},"on":{"on":false},"dimming":{"brightness":100.0,"min_dim_level":0.20000000298023225},"dimming_delta":{},"color_temperature":{"mirek":366,"mirek_valid":true,"mirek_schema":{"mirek_minimum":153,"mirek_maximum":500}},"color_temperature_delta":{},"color":{"xy":{"x":0.4573,"y":0.41},"gamut":{"red":{"x":0.6915,"y":0.3083},"green":{"x":0.17,"y":0.7},"blue":{"x":0.1532,"y":0.0475}},"gamut_type":"C"},"dynamics":{"status":"none","status_values":["none","dynamic_palette"],"speed":0.0,"speed_valid":false},"alert":{"action_values":["breathe"]},"signaling":{"signal_values":["no_signal","on_off","on_off_color","alternating"]},"mode":"normal","effects":{"status_values":["no_effect","candle","fire","prism"],"status":"no_effect","effect_values":["no_effect","candle","fire","prism"]},"powerup":{"preset":"safety","configured":true,"on":{"mode":"on","on":{"on":true}},"dimming":{"mode":"dimming","dimming":{"brightness":100.0}},"color":{"mode":"color_temperature","color_temperature":{"mirek":366}}},"type":"light"},{"id":"f4d936da-441d-46d5-bf58-0089ad4a9aa9","id_v1":"/lights/1","owner":{"rid":"02f7b76f-9365-49be-856e-7ab553d94adb","rtype":"device"},"metadata":{"name":"Hue color lamp 1","archetype":"classic_bulb","function":"mixed"},"product_data":{"function":"mixed"},"identify":{},"on":{"on":false},"dimming":{"brightness":8.3,"min_dim_level":0.20000000298023225},"dimming_delta":{},"color_temperature":{"mirek":366,"mirek_valid":true,"mirek_schema":{"mirek_minimum":153,"mirek_maximum":500}},"color_temperature_delta":{},"color":{"xy":{"x":0.4573,"y":0.41},"gamut":{"red":{"x":0.6915,"y":0.3083},"green":{"x":0.17,"y":0.7},"blue":{"x":0.1532,"y":0.0475}},"gamut_type":"C"},"dynamics":{"status":"none","status_values":["none","dynamic_palette"],"speed":0.0,"speed_valid":false},"alert":{"action_values":["breathe"]},"signaling":{"signal_values":["no_signal","on_off","on_off_color","alternating"]},"mode":"normal","effects":{"status_values":["no_effect","candle","fire","prism"],"status":"no_effect","effect_values":["no_effect","candle","fire","prism"]},"powerup":{"preset":"safety","configured":true,"on":{"mode":"on","on":{"on":true}},"dimming":{"mode":"dimming","dimming":{"brightness":100.0}},"color":{"mode":"color_temperature","color_temperature":{"mirek":366}}},"type":"light"}]}
 ```
 
 Obtenir les détails d'un éclairage avec son identifiant `{lightId}` :
 
 ```bash
-curl -k --location 'https://192.168.52.182/clip/v2/resource/light/f9a9b376-6738-4bd1-81ce-021e2ee56a82' --header 'Accept: application/json' --header 'hue-application-key: XXXXXXXX'
+curl -k --location 'https://192.168.52.182/clip/v2/resource/light/f4d936da-441d-46d5-bf58-0089ad4a9aa9' --header 'Accept: application/json' --header 'hue-application-key: XXXXXXXX'
+{"errors":[],"data":[{"id":"f4d936da-441d-46d5-bf58-0089ad4a9aa9","id_v1":"/lights/1","owner":{"rid":"02f7b76f-9365-49be-856e-7ab553d94adb","rtype":"device"},"metadata":{"name":"Hue color lamp 1","archetype":"classic_bulb","function":"mixed"},"product_data":{"function":"mixed"},"identify":{},"on":{"on":false},"dimming":{"brightness":8.3,"min_dim_level":0.20000000298023225},"dimming_delta":{},"color_temperature":{"mirek":366,"mirek_valid":true,"mirek_schema":{"mirek_minimum":153,"mirek_maximum":500}},"color_temperature_delta":{},"color":{"xy":{"x":0.4573,"y":0.41},"gamut":{"red":{"x":0.6915,"y":0.3083},"green":{"x":0.17,"y":0.7},"blue":{"x":0.1532,"y":0.0475}},"gamut_type":"C"},"dynamics":{"status":"none","status_values":["none","dynamic_palette"],"speed":0.0,"speed_valid":false},"alert":{"action_values":["breathe"]},"signaling":{"signal_values":["no_signal","on_off","on_off_color","alternating"]},"mode":"normal","effects":{"status_values":["no_effect","candle","fire","prism"],"status":"no_effect","effect_values":["no_effect","candle","fire","prism"]},"powerup":{"preset":"safety","configured":true,"on":{"mode":"on","on":{"on":true}},"dimming":{"mode":"dimming","dimming":{"brightness":100.0}},"color":{"mode":"color_temperature","color_temperature":{"mirek":366}}},"type":"light"}]}
 
-wget --no-check-certificate --quiet --method GET --timeout=0 --header 'Accept: application/json' --header 'hue-application-key: XXXXXXXX' 'https://192.168.52.182/clip/v2/resource/light/f9a9b376-6738-4bd1-81ce-021e2ee56a82'
+// ou :
+wget --no-check-certificate --quiet --method GET --timeout=0 --header 'Accept: application/json' --header 'hue-application-key: XXXXXXXX' 'https://192.168.52.182/clip/v2/resource/light/f4d936da-441d-46d5-bf58-0089ad4a9aa9'
 ```
 
 En utilisant une requête `PUT`, il sera alors possible de mettre à jour l'état d'un éclairage, ici `ON/OFF` :
 
 ```bash
-$ wget --no-check-certificate --quiet  --method PUT  --timeout=0   --header 'Content-Type: application/json'   --header 'Accept: application/json'   --header 'hue-application-key: XXXXXXXX' --body-data '{  "on": {    "on": false  }}'    'https://192.168.52.182/clip/v2/resource/light/f9a9b376-6738-4bd1-81ce-021e2ee56a82'
+$ wget --no-check-certificate --quiet  --method PUT  --timeout=0   --header 'Content-Type: application/json'   --header 'Accept: application/json'   --header 'hue-application-key: XXXXXXXX' --body-data '{  "on": {    "on": false  }}'    'https://192.168.52.182/clip/v2/resource/light/f4d936da-441d-46d5-bf58-0089ad4a9aa9'
 
-$ wget --no-check-certificate --quiet  --method PUT  --timeout=0   --header 'Content-Type: application/json'   --header 'Accept: application/json'   --header 'hue-application-key: XXXXXXXX' --body-data '{  "on": {    "on": true  }}'    'https://192.168.52.182/clip/v2/resource/light/f9a9b376-6738-4bd1-81ce-021e2ee56a82'
+$ wget --no-check-certificate --quiet  --method PUT  --timeout=0   --header 'Content-Type: application/json'   --header 'Accept: application/json'   --header 'hue-application-key: XXXXXXXX' --body-data '{  "on": {    "on": true  }}'    'https://192.168.52.182/clip/v2/resource/light/f4d936da-441d-46d5-bf58-0089ad4a9aa9'
 ```
 
 ### Postman
@@ -327,6 +334,10 @@ Créer un nouvel environnement avec ces deux variables :
 - `apiKey` avec comme valeur initiale et courante la valeur `username` obtenue ou à obtenir par une phase d'authentification
 
 ![](./images/postman-new-environment.png)
+
+La liste des éclairages :
+
+![](./images/postman-get-ligths.png)
 
 ### Application cliente
 
