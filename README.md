@@ -10,6 +10,10 @@
     - [Outils CLI](#outils-cli)
     - [Postman](#postman)
     - [Application cliente](#application-cliente)
+    - [Générateur](#générateur)
+    - [Android Java](#android-java)
+    - [Qt](#qt)
+    - [Python](#python)
   - [Boutique](#boutique)
   - [Auteurs](#auteurs)
 
@@ -340,6 +344,290 @@ La liste des éclairages :
 ![](./images/postman-get-ligths.png)
 
 ### Application cliente
+
+Pour faire simple, cela revient à émettre des requêtes HTTP et traiter du JSON.
+
+### Générateur
+
+Des utilitaires comme [Postman](https://www.postman.com/) fournissent des extraits de code à réutiliser :
+
+![](./images/postman-code-snippet.png)
+
+Par exemple pour Java :
+
+![](./images/postman-code-snippet-java.png)
+
+Il existe aussi [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator-cli) qui permet la génération de bibliothèques clientes d'API HTTP avec une spécification [OpenAPI](https://swagger.io/specification/).
+
+> [OpenAPI](https://swagger.io/specification/) est une norme de description des API HTTP conformes à l’architecture REST. La spécification OpenAPI actuelle découle d’un projet antérieur nommé [Swagger](https://swagger.io/) (cf. https://www.ionos.fr/digitalguide/sites-internet/developpement-web/quest-ce-que-openapi/).
+
+Liens :
+
+- https://github.com/OpenAPITools/openapi-generator-cli
+- https://openapi-generator.tech/docs/installation/
+
+Instalation :
+
+```bash
+$ npm install -g @openapitools/openapi-generator-cli
+
+npx openapi-generator-cli version
+Did set selected version to 7.1.0
+7.1.0
+```
+
+Génération de code Python :
+
+```bash
+$ npx @openapitools/openapi-generator-cli generate -g python -i https://api.redocly.com/registry/bundle/openhue/openhue/v2/openapi.yaml -o my-openhue-project
+```
+
+### Android Java
+
+Pour émettre des requêtes HTTP sous Android, il y a plusieurs possibilités. Ici, on utilisera le client HTTP [OkHttp](https://square.github.io/okhttp/).
+
+> On pourrait aussi utiliser le [client HTTP](https://cloud.google.com/java/docs/reference/google-http-client/latest/com.google.api.client.http) de l'API Google.
+
+Pour utiliser [OkHttp](https://square.github.io/okhttp/), il faut tout d'abord ajouter dans le fichier `app/build.gradle` :
+
+```
+dependencies {
+    ...
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    ...
+}
+```
+
+Dans le code source java, il faut préalablement importer les différentes classes utiles pour émettre des requêtes HTTP :
+
+```java
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+```
+
+Pour émettre des requêtes HTTPS, il va être nécessaire d'accepter (tous) les certificats SSL :
+
+```java
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import okhttp3.OkHttpClient;
+
+public class TrustAllCertsClient {
+    public static OkHttpClient getTrustAllCertsClient() throws NoSuchAlgorithmException, KeyManagementException {
+        TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                    }
+
+                    @Override
+                    public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                    }
+
+                    @Override
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return new java.security.cert.X509Certificate[]{};
+                    }
+                }
+        };
+
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+        sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+
+        OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
+        newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
+        newBuilder.hostnameVerifier((hostname, session) -> true);
+        return newBuilder.build();
+    }
+}
+```
+
+On commence par instancier un objet de type `OkHttpClient` :
+
+```java
+OkHttpClient clientOkHttp      = null;
+
+try
+{
+    clientOkHttp = TrustAllCertsClient.getTrustAllCertsClient();
+}
+catch(NoSuchAlgorithmException e)
+{
+    throw new RuntimeException(e);
+}
+catch(KeyManagementException e)
+{
+    throw new RuntimeException(e);
+}
+```
+
+Et pour émettre une requête **GET** :
+
+```java
+String url = "https://discovery.meethue.com/";
+Request request = new Request.Builder().url(url).addHeader("Content-Type", "application/json").build();
+
+clientOkHttp.newCall(request).enqueue(new Callback() {
+    @Override
+    public void onFailure(Call call, IOException e)
+    {
+        e.printStackTrace();
+    }
+
+    @Override
+    public void onResponse(Call call, Response response) throws IOException
+    {
+        Log.d(TAG, "onResponse - message = " + response.message());
+        Log.d(TAG, "onResponse - code    = " + response.code());
+
+        if(!response.isSuccessful())
+        {
+            throw new IOException(response.toString());
+        }
+
+        final String body = response.body().string();
+        Log.d(TAG, "onResponse - body    = " + body);
+    }
+});
+```
+
+Et pour émettre une requête **GET** avec une clé d'API:
+
+```java
+String adresseIPPontHue = "192.168.52.187";
+String hueApplicationKey = "XXXX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+String url = "https://" + adresseIPPontHue + "/clip/v2/resource/light";
+Request request = new Request.Builder()
+                            .url(url)
+                            .addHeader("Content-Type", "application/json")
+                            .addHeader("hue-application-key", hueApplicationKey)
+                            .build();
+
+clientOkHttp.newCall(request).enqueue(new Callback() {
+    @Override
+    public void onFailure(Call call, IOException e)
+    {
+        e.printStackTrace();
+    }
+
+    @Override
+    public void onResponse(Call call, Response response) throws IOException
+    {
+        Log.d(TAG, "onResponse - message = " + response.message());
+        Log.d(TAG, "onResponse - code    = " + response.code());
+
+        if(!response.isSuccessful())
+        {
+            throw new IOException(response.toString());
+        }
+
+        final String body = response.body().string();
+        Log.d(TAG, "onResponse - body    = " + body);
+    }
+});
+```
+
+Ou pour émettre une requête **PUT** avec des données JSON :
+
+```java
+String adresseIPPontHue = "192.168.52.187";
+String hueApplicationKey = "XXXX-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+String id = "f9a9b376-6738-4bd1-81ce-021e2ee56a82";
+String url = "https://" + adresseIPPontHue + "/clip/v2/resource/light/" + id;
+MediaType   JSON     = MediaType.parse("application/json; charset=utf-8");
+String      jsonBody = "{\"on\":{\"on\": true}}";
+RequestBody body     = RequestBody.create(JSON, jsonBody);
+
+Request request = new Request.Builder()
+                    .url(url)
+                    .put(body)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Accept", "application/json")
+                    .addHeader("hue-application-key", hueApplicationKey)
+                    .build();
+
+clientOkHttp.newCall(request).enqueue(new Callback() {
+    @Override
+    public void onFailure(Call call, IOException e)
+    {
+        e.printStackTrace();
+    }
+
+    @Override
+    public void onResponse(Call call, Response response) throws IOException
+    {
+        Log.d(TAG, "onResponse - message = " + response.message());
+        Log.d(TAG, "onResponse - code    = " + response.code());
+
+        if(!response.isSuccessful())
+        {
+            throw new IOException(response.toString());
+        }
+
+        final String body = response.body().string();
+        Log.d(TAG, "onResponse - body    = " + body);
+    }
+});
+```
+
+Un exemple d'application Android "basique" est fournie dans `src/android/MyApplicationHTTP/`
+
+![](./images/android-accueil.png)
+
+![](./images/android-decouvrir.png)
+
+![](./images/android-lister.png)
+
+![](./images/android-eteindre.png)
+
+### Qt
+
+### Python
+
+- Avec `http.client` :
+
+```python
+import http.client
+
+conn = http.client.HTTPSConnection("192.168.52.187")
+payload = ''
+headers = {
+  'Accept': 'application/json',
+  'hue-application-key': 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+}
+conn.request("GET", "/clip/v2/resource/light/f9a9b376-6738-4bd1-81ce-021e2ee56a82", payload, headers)
+res = conn.getresponse()
+data = res.read()
+print(data.decode("utf-8"))
+```
+
+- Avec `requests` :
+
+```python
+import requests
+
+url = "https://187/clip/v2/resource/light/f9a9b376-6738-4bd1-81ce-021e2ee56a82"
+
+payload = {}
+headers = {
+  'Accept': 'application/json',
+  'hue-application-key': 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+}
+
+response = requests.request("GET", url, headers=headers, data=payload)
+
+print(response.text)
+```
 
 ## Boutique
 
