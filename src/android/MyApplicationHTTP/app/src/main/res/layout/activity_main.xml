@@ -11,7 +11,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="http://..."
+        android:text="Philips HUE"
+        android:fontFamily="monospace"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/reponseEtat"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -22,7 +25,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="..."
+        android:text=""
+        android:fontFamily="monospace"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@+id/urlRequete"
         app:layout_constraintBottom_toTopOf="@+id/reponseJson"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -34,10 +40,24 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:text=""
+        android:fontFamily="monospace"
+        android:textSize="14sp"
         app:layout_constraintTop_toBottomOf="@+id/reponseEtat"
         app:layout_constraintBottom_toTopOf="@+id/boutonEnvoyer"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
+
+    <Button
+        android:id="@+id/boutonDecouvrir"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/boutonEnvoyer"
+        app:layout_constraintTop_toBottomOf="@+id/reponseJson"
+        android:text="Découvrir" />
 
     <Button
         android:id="@+id/boutonEnvoyer"
@@ -46,9 +66,33 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/boutonDecouvrir"
+        app:layout_constraintRight_toLeftOf="@+id/boutonEteindre"
+        app:layout_constraintTop_toBottomOf="@+id/reponseJson"
+        android:text="Lister" />
+
+    <Button
+        android:id="@+id/boutonEteindre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/boutonEnvoyer"
+        app:layout_constraintRight_toLeftOf="@+id/boutonAllumer"
+        app:layout_constraintTop_toBottomOf="@+id/reponseJson"
+        android:text="Éteindre" />
+
+    <Button
+        android:id="@+id/boutonAllumer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/boutonEteindre"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/reponseJson"
-        android:text="Envoyer" />
+        android:text="Allumer" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
