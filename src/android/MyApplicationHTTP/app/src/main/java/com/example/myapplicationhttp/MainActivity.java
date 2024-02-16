@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity
     private OkHttpClient clientOkHttp      = null;
     private String       adresseIPPontHue  = "";
     private String       url               = null;
-    private String       hueApplicationKey = "8FcG-JAXZa47KLLtzjmYlDp73nOBrUJ1ktbrmtvf";
+    private String       hueApplicationKey = "";
     private Button       boutonDecouvrir;
     private Button       boutonAuthentifier;
     private Button       boutonEnvoyer;
@@ -273,7 +273,7 @@ public class MainActivity extends AppCompatActivity
 
         Request request = new Request.Builder()
                             .url(url)
-                            .put(body)
+                            .post(body)
                             .addHeader("Content-Type", "application/json")
                             .addHeader("Accept", "application/json")
                             .build();
@@ -314,6 +314,7 @@ public class MainActivity extends AppCompatActivity
                             reponseEtat.setText(response.message());
                         else
                             reponseEtat.setText(String.valueOf(response.code()));
+                        Log.d(TAG, "authentifierHue() body = " + body);
                         reponseJson.setText(body);
 
                         /*
@@ -328,7 +329,23 @@ public class MainActivity extends AppCompatActivity
                             json                     = new JSONArray(body);
                             JSONObject payloadFields = null;
                             payloadFields            = json.getJSONObject(0);
-                            //Log.d(TAG, "authentifierHue() username = " + username);
+                            hueApplicationKey = "";
+                            if(payloadFields.has("success"))
+                            {
+                                Log.d(TAG, "authentifierHue() username = " + payloadFields.getJSONObject("success").getString("username"));
+                                hueApplicationKey = payloadFields.getJSONObject("success").getString("username");
+                            }
+                            else if (payloadFields.has("error"))
+                            {
+                                Log.d(TAG, "authentifierHue() description = " + payloadFields.getJSONObject("error").getString("description"));
+                                if(payloadFields.getJSONObject("error").getInt("type") == 101)
+                                    reponseEtat.setText(payloadFields.getJSONObject("error").getString("description"));
+                            }
+                            else
+                            {
+                                Log.d(TAG, "authentifierHue() payloadFields = " + payloadFields.toString());
+                            }
+
                         }
                         catch(JSONException e)
                         {
