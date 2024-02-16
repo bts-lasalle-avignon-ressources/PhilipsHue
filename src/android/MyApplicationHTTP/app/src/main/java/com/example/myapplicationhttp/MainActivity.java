@@ -35,12 +35,13 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity
 {
-    private final String TAG               = "ClientHTTP";
+    private final String TAG               = "ClientHTTPHue";
     private OkHttpClient clientOkHttp      = null;
     private String       adresseIPPontHue  = "";
     private String       url               = null;
     private String       hueApplicationKey = "8FcG-JAXZa47KLLtzjmYlDp73nOBrUJ1ktbrmtvf";
     private Button       boutonDecouvrir;
+    private Button       boutonAuthentifier;
     private Button       boutonEnvoyer;
     private Button       boutonEteindre;
     private Button       boutonAllumer;
@@ -80,6 +81,22 @@ public class MainActivity extends AppCompatActivity
                 {
                     url = "https://discovery.meethue.com/";
                     decouvrirPontHue(url);
+                }
+                else
+                {
+                    reponseEtat.setText("Aucune connexion réseau !");
+                }
+            }
+        });
+        boutonAuthentifier = (Button)findViewById(R.id.boutonAuthentifier);
+        boutonAuthentifier.setEnabled(false);
+        boutonAuthentifier.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v)
+            {
+                if(estConnecteReseau())
+                {
+                    url = "https://" + adresseIPPontHue + "/api";
+                    authentifierHue(url);
                 }
                 else
                 {
@@ -228,6 +245,98 @@ public class MainActivity extends AppCompatActivity
 
                         if(!adresseIPPontHue.isEmpty())
                         {
+                            boutonAuthentifier.setEnabled(true);
+                        }
+                        else
+                        {
+                            boutonAuthentifier.setEnabled(false);
+                            boutonEnvoyer.setEnabled(false);
+                            boutonEteindre.setEnabled(false);
+                            boutonAllumer.setEnabled(false);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    private void authentifierHue(String url)
+    {
+        if(clientOkHttp == null)
+            return;
+        Log.d(TAG, "authentifierHue() url = " + url);
+        urlRequete.setText(url);
+
+        MediaType   JSON     = MediaType.parse("application/json; charset=utf-8");
+        String      jsonBody = "{\"devicetype\": \"" + TAG + "\",\"generateclientkey\": true}";
+        RequestBody body     = RequestBody.create(JSON, jsonBody);
+
+        Request request = new Request.Builder()
+                            .url(url)
+                            .put(body)
+                            .addHeader("Content-Type", "application/json")
+                            .addHeader("Accept", "application/json")
+                            .build();
+
+        clientOkHttp.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e)
+            {
+                e.printStackTrace();
+                Log.d(TAG, "authentifierHue() onFailure");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run()
+                    {
+                        reponseEtat.setText("Erreur requête OkHttp !");
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException
+            {
+                Log.d(TAG, "authentifierHue() onResponse - message = " + response.message());
+                Log.d(TAG, "authentifierHue() onResponse - code    = " + response.code());
+
+                if(!response.isSuccessful())
+                {
+                    throw new IOException(response.toString());
+                }
+
+                final String body = response.body().string();
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run()
+                    {
+                        if(!response.message().isEmpty())
+                            reponseEtat.setText(response.message());
+                        else
+                            reponseEtat.setText(String.valueOf(response.code()));
+                        reponseJson.setText(body);
+
+                        /*
+                            [{"error":{"type":101,"address":"","description":"link button not pressed"}}]
+                            [{"success":{"username":"XXXXXXXX","clientkey":"YYYYYYYY"}}]
+                        */
+
+                        JSONArray json = null;
+
+                        try
+                        {
+                            json                     = new JSONArray(body);
+                            JSONObject payloadFields = null;
+                            payloadFields            = json.getJSONObject(0);
+                            //Log.d(TAG, "authentifierHue() username = " + username);
+                        }
+                        catch(JSONException e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        if(!hueApplicationKey.isEmpty())
+                        {
                             boutonEnvoyer.setEnabled(true);
                         }
                         else
@@ -246,7 +355,6 @@ public class MainActivity extends AppCompatActivity
     {
         if(clientOkHttp == null)
             return;
-        Log.d(TAG, "listerEclairages()");
         Log.d(TAG, "listerEclairages() url = " + url);
         urlRequete.setText(url);
         Request request = new Request.Builder()
@@ -333,7 +441,8 @@ public class MainActivity extends AppCompatActivity
                                 Log.d(TAG,
                                       "listerEclairages() id = " + id +
                                         " - type = " + eclairage.getString("type"));
-                                idEclairages.add(id);
+                                if(eclairage.getString("type").equals("light"))
+                                    idEclairages.add(id);
                             }
                         }
                         catch(JSONException e)
@@ -361,7 +470,6 @@ public class MainActivity extends AppCompatActivity
     {
         if(clientOkHttp == null)
             return;
-        Log.d(TAG, "eteindreEclairage()");
         Log.d(TAG, "eteindreEclairage() url = " + url);
         urlRequete.setText(url);
 
@@ -428,7 +536,6 @@ public class MainActivity extends AppCompatActivity
     {
         if(clientOkHttp == null)
             return;
-        Log.d(TAG, "allumerEclairage()");
         Log.d(TAG, "allumerEclairage() url = " + url);
         urlRequete.setText(url);
 
