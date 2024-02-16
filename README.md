@@ -533,8 +533,29 @@ clientOkHttp.newCall(request).enqueue(new Callback() {
 
         final String body = response.body().string();
         Log.d(TAG, "onResponse - body    = " + body);
+
+        //@todo traiter le JSON ...
     }
 });
+```
+
+Et pour émettre une requête **POST** :
+
+```java
+String adresseIPPontHue = "192.168.52.187";
+String url = "https://" + adresseIPPontHue + "/api/";
+MediaType   JSON     = MediaType.parse("application/json; charset=utf-8");
+String      jsonBody = "{\"devicetype\": \"" + TAG + "\",\"generateclientkey\": true}";
+RequestBody body     = RequestBody.create(JSON, jsonBody);
+
+Request request = new Request.Builder()
+                    .url(url)
+                    .post(body)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Accept", "application/json")
+                    .build();
+
+...
 ```
 
 Ou pour émettre une requête **PUT** avec des données JSON :
