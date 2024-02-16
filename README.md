@@ -12,10 +12,10 @@
     - [Application cliente](#application-cliente)
     - [Générateur](#générateur)
     - [Android Java](#android-java)
-    - [Qt](#qt)
+    - [Qt C++](#qt-c)
     - [Python](#python)
   - [Boutique](#boutique)
-  - [Auteurs](#auteurs)
+  - [Auteur](#auteur)
 
 ---
 
@@ -601,7 +601,7 @@ clientOkHttp.newCall(request).enqueue(new Callback() {
 });
 ```
 
-Un exemple d'application Android "basique" est fournie dans `src/android/MyApplicationHTTP/`
+Un exemple d'application Android "basique" est fournie dans `src/android/MyApplicationHTTP/` :
 
 ![](./images/android-accueil.png)
 
@@ -611,7 +611,129 @@ Un exemple d'application Android "basique" est fournie dans `src/android/MyAppli
 
 ![](./images/android-eteindre.png)
 
-### Qt
+### Qt C++
+
+Pour émettre des requêtes HTTP sous Qt, il faudra utiliser la classe [QNetworkAccessManager](https://doc.qt.io/qt-6/qnetworkaccessmanager.html).
+
+Il faut tout d'abord activer le module `network` dans le fichier de projet `.pro` pour accéder aux classes :
+
+```
+QT += network
+```
+
+Il faut ensuite accéder aux déclarations des classes :
+
+```cpp
+#include <QtNetwork/QNetworkAccessManager>
+#include <QNetworkReply>
+```
+
+On commence par instancier un objet de type `QNetworkAccessManager` :
+
+```cpp
+QNetworkAccessManager* accesReseau = new QNetworkAccessManager(this);
+```
+
+Il faut ensuite connecter le signal `finished()` à un slot qui permettra de traiter la réponse à une requête :
+
+```cpp
+connect(accesReseau,
+        SIGNAL(finished(QNetworkReply*)),
+        this,
+        SLOT(traiterReponseHue(QNetworkReply*)));
+```
+
+Émettre une requête **GET** :
+
+```cpp
+QUrl            url = QUrl("https://discovery.meethue.com/");
+QNetworkRequest requeteGet;
+requeteGet.setUrl(url);
+requeteGet.setRawHeader("Content-Type", "application/json");
+accesReseau->get(requeteGet);
+```
+
+Le slot sera automatiquement appelé lorsque la réponse sera reçue :
+
+```cpp
+void MyApplicationHTTP::traiterReponseHue(QNetworkReply* reponse)
+{
+    if(reponse->error() != QNetworkReply::NoError)
+    {
+        qDebug() << Q_FUNC_INFO << "erreur" << reponse->error();
+        qDebug() << Q_FUNC_INFO << "erreur" << reponse->errorString();
+        return;
+    }
+    QByteArray donneesReponse = reponse->readAll();
+    qDebug() << Q_FUNC_INFO << "donneesReponse" << donneesReponse;
+    ...
+    // @todo traiter les données JSON
+}
+```
+
+Émettre une requête **GET** avec une clé d'API :
+
+```cpp
+QString         api = "https://" + adresseIPPontHue + "/clip/v2/resource/light";
+QUrl            url = QUrl(api);
+QNetworkRequest requeteGet;
+requeteGet.setUrl(url);
+requeteGet.setRawHeader("Content-Type", "application/json");
+requeteGet.setRawHeader("hue-application-key", hueApplicationKey.toLocal8Bit());
+// Pour émettre des requêtes HTTPS, il va être nécessaire d'accepter (tous) les certificats SSL
+QSslConfiguration conf = requeteGet.sslConfiguration();
+conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+requeteGet.setSslConfiguration(conf);
+accesReseau->get(requeteGet);
+```
+
+Émettre une requête **POST** :
+
+```cpp
+QString         api = "https://" + adresseIPPontHue + "/api";
+QNetworkRequest requetePost;
+QUrl            url  = QUrl(api);
+QByteArray      json = "{\"devicetype\": \"ClientHTTPHue\",\"generateclientkey\": true}";
+requetePost.setUrl(url);
+requetePost.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+requetePost.setRawHeader("Content-Type", "application/json");
+requetePost.setRawHeader("Content-Length", QByteArray::number(json.size()));
+requetePost.setRawHeader("Accept", "application/json");
+// Pour émettre des requêtes HTTPS, il va être nécessaire d'accepter (tous) les certificats SSL
+QSslConfiguration conf = requetePost.sslConfiguration();
+conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+requetePost.setSslConfiguration(conf);
+accesReseau->post(requetePost, json);
+```
+
+Ou pour émettre une requête **PUT** avec des données JSON :
+
+```cpp
+QString         id  = "f9a9b376-6738-4bd1-81ce-021e2ee56a82";
+QString         api = "https://" + adresseIPPontHue + "/clip/v2/resource/light/" + id;
+QNetworkRequest requetePut;
+QUrl            url  = QUrl(api);
+QByteArray      json = "{\"on\":{\"on\": true}}";
+requetePut.setUrl(url);
+requetePut.setRawHeader("Content-Type", "application/json");
+requetePut.setRawHeader("Accept", "application/json");
+requetePut.setRawHeader("hue-application-key", hueApplicationKey.toLocal8Bit());
+// Pour émettre des requêtes HTTPS, il va être nécessaire d'accepter (tous) les certificats SSL
+QSslConfiguration conf = requetePut.sslConfiguration();
+conf.setPeerVerifyMode(QSslSocket::VerifyNone);
+requetePut.setSslConfiguration(conf);
+accesReseau->put(requetePut, json);
+```
+
+Un exemple d'application Qt "basique" est fournie dans `src/qt/` :
+
+![](./images/qt-accueil.png)
+
+![](./images/qt-decouvrir.png)
+
+![](./images/qt-authentifier.png)
+
+![](./images/qt-allumer.png)
 
 ### Python
 
@@ -655,9 +777,8 @@ print(response.text)
 - [Philips Hue](https://www.philips-hue.com/fr-fr/products/)
 - [Amazon](https://www.amazon.fr/stores/PhilipsHue/page/1D8D599B-E9F3-4C60-971C-276FC75625AB)
 
-## Auteurs
+## Auteur
 
-- Jérôme BEAUMONT <<beaumontlasalle84@gmail.com>>
 - Thierry VAIRA <<thierry.vaira@gmail.com>>
 
 ---
