@@ -601,7 +601,7 @@ clientOkHttp.newCall(request).enqueue(new Callback() {
 });
 ```
 
-Un exemple d'application Android "basique" est fournie dans `src/android/MyApplicationHTTP/` :
+Un exemple d'application Android "basique" est fourni dans `src/android/MyApplicationHTTP/` :
 
 ![](./images/android-accueil.png)
 
@@ -725,7 +725,7 @@ requetePut.setSslConfiguration(conf);
 accesReseau->put(requetePut, json);
 ```
 
-Un exemple d'application Qt "basique" est fournie dans `src/qt/` :
+Un exemple d'application Qt "basique" est fourni dans `src/qt/` :
 
 ![](./images/qt-accueil.png)
 
